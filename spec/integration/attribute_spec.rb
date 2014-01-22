@@ -51,5 +51,19 @@ describe "When the .attribute method is called" do
         expect( json['field'] ).to eq "2013-11-14"
       end
     end
+
+    context "that is not a column name" do
+      serializer do
+        attribute :name
+
+        def name
+          "Tyler Durton"
+        end
+      end
+
+      it "returns the value from the method" do
+        expect( json['name'] ).to eq "Tyler Durton"
+      end
+    end
   end
 end
