@@ -14,13 +14,13 @@ module DBExtensions
     base.let(:connection) { Example.connection }
   end
 
-  def create_table(&block)
-    connection.create_table(:examples, &block)
-    Example.reset_column_information
+  def create_table(model = Example, &block)
+    connection.create_table(model.table_name, &block)
+    model.reset_column_information
   end
 
-  def remove_table
-    connection.drop_table(:examples)
+  def remove_table(model = Example)
+    connection.drop_table(model.table_name)
   end
 
   Rspec.configure { |c| c.include self } if defined?(RSpec)
