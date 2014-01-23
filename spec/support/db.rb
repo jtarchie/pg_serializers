@@ -1,3 +1,4 @@
+require 'active_record'
 options = {adapter: "postgresql", database: "pjs_test", username: "jtarchie"}
 
 ActiveRecord::Base.establish_connection options.merge('database' => 'postgres', 'schema_search_path' => 'public')
@@ -22,5 +23,5 @@ module DBExtensions
     connection.drop_table(:examples)
   end
 
-  Rspec.configure { |c| c.include self }
+  Rspec.configure { |c| c.include self } if defined?(RSpec)
 end
