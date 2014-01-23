@@ -5,10 +5,13 @@ require_relative '../spec/support/db'
 
 n = 100000
 
+
 connection = Example.connection
 connection.create_table(:examples) {|t| t.integer :number }
 
 n.times{|i| Example.create(number: i)}
+
+ActiveRecord::Base.logger = Logger.new(STDOUT)
 
 class Serializer < PostgresJsonSerializer::Serializer
   attribute :number
