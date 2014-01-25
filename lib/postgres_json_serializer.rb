@@ -10,7 +10,7 @@ module PostgresJsonSerializer
       connection = serializer.scope.connection
       if serializer.respond_to?(field)
         value = serializer.send(field)
-        value = Arel::SqlLiteral.new(connection.quote(value)) unless value.is_a?(Arel::SqlLiteral)
+        value = Arel.sql(connection.quote(value)) unless value.is_a?(Arel::SqlLiteral)
       else
         model = serializer.scope.model
         value = model.arel_table[field]
@@ -26,13 +26,26 @@ module PostgresJsonSerializer
       reflection = model.reflections[field]
       klass = reflection.klass
 
-      serializer.scope.joins!(field).references!(field)
-      arel = Arel::Nodes::NamedFunction.new("array_agg",[klass.arel_table[klass.primary_key]])
-      arel.as(custom_key("#{field}_ids"))
+      scope = klass.all
+        .merge(reflection.scope)
+        .where(klass.arel_table[reflection.foreign_key].eq(model.arel_table[reflection.active_record_primary_key]))
+
+      alias_table = Arel::Table.new("d")
+
+      select = Arel::SelectManager.new(Arel::Table.engine)
+      select.project(Arel::Nodes::NamedFunction.new("array_agg",[alias_table[klass.primary_key]]))
+      select.from(Arel::Nodes::TableAlias.new(scope.arel, alias_table.name))
+      select.as(custom_key("#{field}_ids"))
     end
   end
 
-  class Serializer < Struct.new(:scope)
+  class Serializer
+    attr_reader :scope
+
+    def initialize(scope)
+      @scope = scope.dup
+    end
+
     def self.has_many(field, options = {})
       add_attribute Association.new(field, options)
     end
@@ -59,3 +72,4 @@ module PostgresJsonSerializer
     end
   end
 end
+

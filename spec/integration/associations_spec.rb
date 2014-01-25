@@ -16,10 +16,18 @@ describe "When there are associations on the serializer" do
       has_many :children, embed: :ids
     end
 
-    def create_example_json(name)
+    def json(scope)
+      JSON.parse(serializer.new(scope).to_json)
+    end
+
+    def create_example(name)
       example = Example.create(name: name)
       3.times.collect{ example.children.create }
-      JSON.parse(serializer.new(Example.where(id: example.id)).to_json).first
+      example
+    end
+
+    def create_example_json(name)
+      json(Example.where(id: create_example(name).id)).first
     end
 
     it "returns only the associated ids" do
@@ -35,6 +43,12 @@ describe "When there are associations on the serializer" do
 
       expect( bob_json['children_ids'] ).to match_array [1, 2, 3]
       expect( tom_json['children_ids'] ).to match_array [4, 5, 6]
+    end
+
+    it "only contains one version of the parent" do
+      example = create_example("Bob")
+
+      expect( json(Example.where(id: example.id)).length ).to eq 1
     end
 
     context "with options" do
