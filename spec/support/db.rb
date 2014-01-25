@@ -27,5 +27,5 @@ module DBExtensions
     connection.drop_table(model.table_name)
   end
 
-  Rspec.configure { |c| c.include self } if defined?(RSpec)
+  RSpec.configure { |c| c.include self } if defined?(RSpec)
 end
