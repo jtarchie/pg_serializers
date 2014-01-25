@@ -7,7 +7,11 @@ connection.drop_database options[:database] rescue nil
 connection.create_database options[:database]
 ActiveRecord::Base.establish_connection options
 
-class Example < ActiveRecord::Base; end
+class Example < ActiveRecord::Base
+  has_many :children
+end
+
+class Child < ActiveRecord::Base; end
 
 module DBExtensions
   def self.included(base)
