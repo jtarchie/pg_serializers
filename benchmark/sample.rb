@@ -3,7 +3,7 @@ require 'oj'
 require 'postgres_json_serializer'
 require_relative '../spec/support/db'
 
-n = 100000
+n = 10000
 
 
 connection = Example.connection
@@ -18,6 +18,7 @@ class Serializer < PostgresJsonSerializer::Serializer
 end
 
 Benchmark.bm do |x|
-  x.report("to_json") { Example.all.to_json }
-  x.report("serializer") { Serializer.new(Example.all).to_json }
+  x.report("scope.to_json") { Example.all.to_json }
+  x.report("scope.pluck") { Example.connection.select_all(Example.all.to_sql).to_json }
+  x.report("serializer(scope)") { Serializer.new(Example.all).to_json }
 end
