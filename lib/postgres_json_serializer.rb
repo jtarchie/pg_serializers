@@ -63,7 +63,7 @@ module PostgresJsonSerializer
       @attributes += attributes
     end
 
-    def to_json
+    def to_json(*)
       connection = scope.connection
       attributes_select = self.class.attributes.collect do |a|
         a.to_arel(self)
