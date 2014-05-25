@@ -16,26 +16,7 @@ module PostgresJsonSerializer
         value = model.arel_table[field]
       end
 
-      value.as(custom_key(field))
-    end
-  end
-
-  class Association < Attribute
-    def to_arel(serializer)
-      model = serializer.scope.model
-      reflection = model.reflections[field]
-      klass = reflection.klass
-
-      scope = klass.all
-        .merge(reflection.scope)
-        .where(klass.arel_table[reflection.foreign_key].eq(model.arel_table[reflection.active_record_primary_key]))
-
-      alias_table = Arel::Table.new("d")
-
-      select = Arel::SelectManager.new(Arel::Table.engine)
-      select.project(Arel::Nodes::NamedFunction.new("array_agg",[alias_table[klass.primary_key]]))
-      select.from(Arel::Nodes::TableAlias.new(scope.arel, alias_table.name))
-      select.as(custom_key("#{field}_ids"))
+      value.as(connection.quote_column_name(custom_key(field)))
     end
   end
 
@@ -44,10 +25,6 @@ module PostgresJsonSerializer
 
     def initialize(scope)
       @scope = scope.dup
-    end
-
-    def self.has_many(field, options = {})
-      add_attribute Association.new(field, options)
     end
 
     def self.attribute(field, options = {})

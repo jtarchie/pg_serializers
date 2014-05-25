@@ -21,6 +21,17 @@ describe "When the .attribute method is called" do
         expect( json ).to_not have_key('field')
       end
     end
+    context "that define a custome key with mixed-cased letters" do
+      serializer { attribute :field, key: "LostBoyz123" }
+
+      it "returns the value of the field under the specified key" do
+        expect( json['LostBoyz123'] ).to eq 'value'
+      end
+
+      it "does not contain the original field as a key" do
+        expect( json ).to_not have_key('field')
+      end
+    end
   end
 
   context "with a custom attribute method" do
