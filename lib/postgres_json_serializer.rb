@@ -45,7 +45,7 @@ module PostgresJsonSerializer
       attributes_select = self.class.attributes.collect do |a|
         a.to_arel(self)
       end
-      connection.select_value("SELECT array_to_json(array_agg(row_to_json(t))) FROM (#{scope.select(attributes_select).to_sql}) t")
+      connection.select_value("SELECT COALESCE(array_to_json(array_agg(row_to_json(t))), '[]') FROM (#{scope.select(attributes_select).to_sql}) t")
     end
   end
 end
