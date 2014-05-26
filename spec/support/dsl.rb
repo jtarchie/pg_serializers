@@ -1,6 +1,6 @@
 module DslHelper
   def json
-    JSON.parse(serializer.new(Example.all).to_json).first
+    JSON.parse(serializer.new(Example.all).to_json)
   end
 
   module ClassMethods

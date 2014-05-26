@@ -14,7 +14,7 @@ describe 'With default return values' do
 
   context 'when no results are found' do
     it 'returns an empty array' do
-      expect(json).to be_nil
+      expect(json.first).to be_nil
     end
   end
 end

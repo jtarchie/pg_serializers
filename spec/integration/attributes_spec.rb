@@ -14,7 +14,7 @@ describe "When the .attributes method is called" do
     serializer { attributes :field, :field1 }
 
     it 'returns only the defined fields' do
-      expect( json ).to eq({'field' => 'value', 'field1' => 'another'})
+      expect( json.first ).to eq({'field' => 'value', 'field1' => 'another'})
     end
   end
 end
